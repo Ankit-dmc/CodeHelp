@@ -1,0 +1,321 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>CodeHelp</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🚀 CodeHelp</h1>
+
+    <form method="POST" onsubmit="const btn = document.getElementById('submit-btn'); btn.disabled = true; btn.innerText = 'Analyzing...';">
+
+        <textarea
+            name="code"
+            placeholder="Paste your Python/C/C++/Java code here..."
+        >{% if code %}{{ code }}{% endif %}</textarea>
+
+        <button type="submit" id="submit-btn">
+            Analyze Code
+        </button>
+
+    </form>
+
+    {% if result %}
+
+        {% if result.error %}
+            <div class="card">
+                <h2>Error</h2>
+                <pre>{{ result.error }}</pre>
+            </div>
+        {% else %}
+
+        <div class="card">
+            <h2>📖 Explanation</h2>
+            <pre>{{ result.explanation }}</pre>
+        </div>
+
+        <div class="card">
+            <h2>⏱ Time Complexity</h2>
+
+            <p>
+                <strong>
+                    {{ result.time_complexity.complexity }}
+                </strong>
+            </p>
+
+            <pre>{{ result.time_complexity.reason }}</pre>
+        </div>
+
+        <div class="card">
+            <h2>💾 Space Complexity</h2>
+
+            <p>
+                <strong>
+                    {{ result.space_complexity.complexity }}
+                </strong>
+            </p>
+
+            <pre>{{ result.space_complexity.reason }}</pre>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Difficulty</h2>
+
+            <pre>{{ result.difficulty }}</pre>
+        </div>
+
+        <div class="card">
+            <h2>📚 Concepts Used</h2>
+
+            <ul>
+                {% for concept in result.concepts_used %}
+                    <li>{{ concept }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🐛 Bugs & Edge Cases</h2>
+
+            <ul>
+                {% for bug in result.bugs %}
+                    <li>{{ bug }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>⚡ Optimization Suggestions</h2>
+
+            <ul>
+                {% for opt in result.optimizations %}
+                    <li>{{ opt }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% endif %}
+    {% endif %}
+
+</div>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeHelp</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="brand-name">CodeHelp</span>
+    </div>
+    <span class="brand-tag">STATIC ANALYSIS ENGINE</span>
+</header>
+
+<div class="container">
+
+    <form method="POST" id="analyze-form">
+
+        <div class="code-input" id="code-input-wrapper">
+            <textarea
+                id="code-area"
+                name="code"
+                placeholder="Paste your Python / C / C++ / Java code here&#10;&#10;CodeHelp will explain it, score its complexity, and flag what to fix."
+            >{% if code %}{{ code }}{% endif %}</textarea>
+            <div class="input-meta">
+                <span id="line-count">0 lines</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" id="submit-btn">
+                <span class="btn-label">Analyze code</span>
+                <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+            </button>
+        </div>
+
+    </form>
+
+    {% if result %}
+
+        {% if result.error %}
+
+            <div class="card card-error">
+                <p class="eyebrow">[ERROR]</p>
+                <h2>Something went wrong</h2>
+                <pre>{{ result.error }}</pre>
+            </div>
+
+        {% else %}
+
+        <section class="results" aria-label="Analysis results">
+
+            <div class="card card-wide reveal" style="--delay: 0">
+                <p class="eyebrow">[EXPLAIN]</p>
+                <h2>Explanation</h2>
+                <pre>{{ result.explanation }}</pre>
+            </div>
+
+            <div class="metrics-row">
+
+                <div class="card card-metric reveal" style="--delay: 1">
+                    <p class="eyebrow">[TIME_COMPLEXITY]</p>
+                    <h2>Time complexity</h2>
+                    <div class="metric-readout">
+                        <span class="metric-value" data-metric="time">{{ result.time_complexity.complexity }}</span>
+                    </div>
+                    <div class="severity-track" data-severity-for="time"><div class="severity-fill"></div></div>
+                    <pre class="reason">{{ result.time_complexity.reason }}</pre>
+                </div>
+
+                <div class="card card-metric reveal" style="--delay: 2">
+                    <p class="eyebrow">[SPACE_COMPLEXITY]</p>
+                    <h2>Space complexity</h2>
+                    <div class="metric-readout">
+                        <span class="metric-value" data-metric="space">{{ result.space_complexity.complexity }}</span>
+                    </div>
+                    <div class="severity-track" data-severity-for="space"><div class="severity-fill"></div></div>
+                    <pre class="reason">{{ result.space_complexity.reason }}</pre>
+                </div>
+
+            </div>
+
+            <div class="card card-wide card-difficulty reveal" style="--delay: 3">
+                <p class="eyebrow">[DIFFICULTY]</p>
+                <h2>Difficulty</h2>
+                <span class="difficulty-pill" data-difficulty>{{ result.difficulty }}</span>
+            </div>
+
+            <div class="lists-row">
+
+                <div class="card reveal" style="--delay: 4">
+                    <p class="eyebrow">[CONCEPTS]</p>
+                    <h2>Concepts used</h2>
+                    <ul class="list-neutral">
+                        {% for concept in result.concepts_used %}
+                            <li>{{ concept }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="card reveal" style="--delay: 5">
+                    <p class="eyebrow">[BUGS]</p>
+                    <h2>Bugs &amp; edge cases</h2>
+                    <ul class="list-flagged">
+                        {% for bug in result.bugs %}
+                            <li>{{ bug }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="card reveal" style="--delay: 6">
+                    <p class="eyebrow">[OPTIMIZE]</p>
+                    <h2>Optimization suggestions</h2>
+                    <ul class="list-positive">
+                        {% for opt in result.optimizations %}
+                            <li>{{ opt }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="empty-state">
+            <p class="eyebrow">[STANDBY]</p>
+            <p>Paste a function above and run analysis — you'll get a plain-English
+               explanation, time and space complexity, the concepts it relies on,
+               edge cases worth checking, and ways to make it faster.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+(function () {
+    var form = document.getElementById('analyze-form');
+    var btn = document.getElementById('submit-btn');
+    var wrapper = document.getElementById('code-input-wrapper');
+    var textarea = document.getElementById('code-area');
+    var lineCount = document.getElementById('line-count');
+
+    function updateLineCount() {
+        var lines = textarea.value === '' ? 0 : textarea.value.split('\n').length;
+        lineCount.textContent = lines + (lines === 1 ? ' line' : ' lines');
+    }
+    if (textarea) {
+        textarea.addEventListener('input', updateLineCount);
+        updateLineCount();
+    }
+
+    if (form) {
+        form.addEventListener('submit', function () {
+            btn.disabled = true;
+            btn.querySelector('.btn-label').textContent = 'Analyzing\u2026';
+            if (wrapper) wrapper.classList.add('scanning');
+        });
+    }
+
+    // Classify a Big-O style string into a severity tier.
+    function classifyComplexity(text) {
+        var t = (text || '').toLowerCase().replace(/\s+/g, '');
+        if (!t) return null;
+        if (/2\^n|n!|o\(n\^[3-9]/.test(t)) return 'extreme';
+        if (/n\^2|n2|n\*n|n²/.test(t)) return 'heavy';
+        if (/nlogn|nlog\(n\)/.test(t)) return 'moderate';
+        if (/o\(n\)/.test(t)) return 'moderate';
+        if (/logn|o\(1\)|constant/.test(t)) return 'light';
+        return null;
+    }
+
+    var severityToFill = { light: 22, moderate: 55, heavy: 82, extreme: 100 };
+
+    document.querySelectorAll('.metric-value[data-metric]').forEach(function (el) {
+        var tier = classifyComplexity(el.textContent);
+        var key = el.getAttribute('data-metric');
+        var track = document.querySelector('.severity-track[data-severity-for="' + key + '"]');
+        if (!tier || !track) return;
+        var fill = track.querySelector('.severity-fill');
+        track.setAttribute('data-tier', tier);
+        fill.style.width = severityToFill[tier] + '%';
+    });
+
+    var diffEl = document.querySelector('[data-difficulty]');
+    if (diffEl) {
+        var d = diffEl.textContent.toLowerCase();
+        var tier = null;
+        if (/easy|beginner|simple/.test(d)) tier = 'light';
+        else if (/medium|intermediate|moderate/.test(d)) tier = 'moderate';
+        else if (/hard|advanced|difficult|expert/.test(d)) tier = 'heavy';
+        if (tier) diffEl.setAttribute('data-tier', tier);
+    }
+})();
+</script>
+
+</body>
+</html>
